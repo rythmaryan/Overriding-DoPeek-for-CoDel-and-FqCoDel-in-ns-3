@@ -1,2 +1,2 @@
 # Overriding-DoPeek-for-CoDel-and-FqCoDel-in-ns-3
-Codel is a AQM algorithm which works at the dequeue time at the output port of the router. Peek() and DoPeek() together helps in getting the next element to be dequeued
+Codel is a AQM algorithm which works at the dequeue time at the output port of the router. Peek() and DoPeek() together helps in getting the next element to be dequeued. And ns3 implementation of DoPeek() causes a actual internal dequeue which can cause problem in Codel algorithm. Hence in this project we would be overriding the base class DoPeek() method to fit with Codel, and resolve the issue.  

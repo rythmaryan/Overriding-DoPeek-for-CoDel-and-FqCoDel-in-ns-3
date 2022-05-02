@@ -4,11 +4,11 @@ Clone the repository of ns3 - `git clone https://gitlab.com/nsnam/ns-3-dev`
 
 Description of the issue: https://gitlab.com/nsnam/ns-3-dev/-/issues/209
 
-<---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<-------------------------------------------------------------------------------------------------------------------------------------------------------->
 
-Peek() and DoPeek() function in ns-3 is used to get a copy of next element to be dequed from the queue. However, the implementation of Peek() and DoPeek() is such that Peek() calls DoPeek() function and first an Item is dequeued and stored in a pointer variable called m_requeued. Even if the Item is dequeued it is still considered as a part of the queue. 
+Peek() and DoPeek() function in ns-3 is used to get a copy of next element to be dequed from the queue. However, the implementation of Peek() and DoPeek() is such that Peek() calls DoPeek() function and first an Item is dequeued and stored in a pointer variable called m_requeued. Even if the Item is dequeued it is still considered as a part of the queue. This behaviour of the Peek and DoPeek is motivated from the Linux Kernal implementation of the function qdisc_peek_dequeued. This is recommended for the queue discs in which the next packet to be extracted is not obvious.  
 
-`DoPeek()` function in NS-3:
+Default `DoPeek()` function in NS-3:
  https://gitlab.com/nsnam/ns-3-dev/-/blob/master/src/traffic-control/model/queue-disc.cc#L935
  
  Complete view of router queue given below, when a peek is called- 
@@ -25,7 +25,7 @@ Peek() and DoPeek() function in ns-3 is used to get a copy of next element to be
  --------------------------------------------------------------------
  ```
 
-**Codel** 
+**CoDel** 
 
 Codel is an AQM(Active Queue Management) algorithm, which works at the output port, in dequeue time. It calculates `current_queue_delay` during dequeue time and based on its value, decides whether to drop or mark this packet / Item.
 

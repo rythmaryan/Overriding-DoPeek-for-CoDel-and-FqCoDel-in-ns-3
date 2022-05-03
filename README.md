@@ -6,7 +6,7 @@ Description of the issue: https://gitlab.com/nsnam/ns-3-dev/-/issues/209
 
 <-------------------------------------------------------------------------------------------------------------------------------------------------------->
 
-Peek() and DoPeek() function in ns-3 is used to get a copy of next element to be dequed from the queue. However, the implementation of Peek() and DoPeek() is such that Peek() calls DoPeek() function and first an Item is dequeued and stored in a pointer variable called m_requeued. Even if the Item is dequeued it is still considered as a part of the queue. This behaviour of the Peek and DoPeek is motivated from the Linux Kernal implementation of the function qdisc_peek_dequeued. This is recommended for the queue discs in which the next packet to be extracted is not obvious.  
+`Peek()` and `DoPeek()` function in ns-3 is used to get a copy of next element to be dequed from the queue. However, the implementation of `Peek()` and `DoPeek()` is such that `Peek()` calls `DoPeek()` function and first an Item is dequeued and stored in a pointer variable called `m_requeued`. Even if the Item is dequeued it is still considered as a part of the queue. This behaviour of the `Peek()` and `DoPeek()` is motivated from the Linux Kernal implementation of the function `qdisc_peek_dequeued`. This is recommended for the queue discs in which the next packet to be extracted is not obvious.  
 
 Default `DoPeek()` function in NS-3:
  https://gitlab.com/nsnam/ns-3-dev/-/blob/master/src/traffic-control/model/queue-disc.cc#L935

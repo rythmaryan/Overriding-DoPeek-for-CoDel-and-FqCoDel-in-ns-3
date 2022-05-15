@@ -4,14 +4,14 @@ The test was done on codel qdisc with 2 peek functions under consideration
 2. The peek function implemented in Cobalt-queue-dics, which just returns the head item on the queue.
 
 Experiment time line -
-
+```
       2 * target                       2 * interval
 0ms             10ms                                                 210ms                               
 ----------------------------------------------------------------------------------------------------------
 enqueue     1st dequeue and peek              timer                2nd dequeue
 all            timer                         expires                 
 packets        starts                       at 110 ms
-
+```
 Our aim of the this 1st experiment is to check the behaviour of peek, when peek is called before the timer expires and subsequently dequeue is called after the timer expires.
 
 Results -

@@ -184,7 +184,8 @@ CoDelQueueDisc::DoPeek (void)
 
   // Runs the CoDel algorithm on the peek queues without effecting the internal queue
   Ptr<QueueDiscItem> item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-  peeked_bytes+=item->GetSize();
+  if(item)
+    peeked_bytes+=item->GetSize();
 
   if (!item)
     {
@@ -230,7 +231,8 @@ CoDelQueueDisc::DoPeek (void)
               peek_queueBuffer->Enqueue(item);
 
               item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-              peeked_bytes+=item->GetSize();
+              if(item)
+                peeked_bytes+=item->GetSize();
 
               if (!OkToDrop (item, now, peeked_bytes))
                 {
@@ -262,7 +264,8 @@ CoDelQueueDisc::DoPeek (void)
               peek_queueBuffer->Enqueue(item);
 
               item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-              peeked_bytes+=item->GetSize();
+              if(item)
+                peeked_bytes+=item->GetSize();
 
               OkToDrop (item, now, peeked_bytes);
             }
@@ -292,7 +295,7 @@ CoDelQueueDisc::DoPeek (void)
     // Preserving the previous states
     m_firstAboveTime = peek_firstAboveTime;
     peek_queueBuffer->Enqueue(item);
-
+  
     return item;
 }
 

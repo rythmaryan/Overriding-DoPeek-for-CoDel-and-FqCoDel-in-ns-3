@@ -940,13 +940,13 @@ QueueDisc::Peek (void)
 {
   NS_LOG_FUNCTION (this);
   if(!m_peekType)
-  {
-    return QueueDisc::DoPeek();
-  }
+    {
+      return QueueDisc::DoPeek();
+    }
   else
-  {
-    return DoPeek ();
-  }
+    {
+      return DoPeek ();
+    }
 }
 
 Ptr<const QueueDiscItem>

@@ -184,7 +184,8 @@ CoDelQueueDisc::DoPeek (void)
 
   // Runs the CoDel algorithm on the peek queues without effecting the internal queue
   Ptr<QueueDiscItem> item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-  peeked_bytes+=item->GetSize();
+  if(item)
+    peeked_bytes+=item->GetSize();
 
   if (!item)
     {
@@ -230,7 +231,8 @@ CoDelQueueDisc::DoPeek (void)
               peek_queueBuffer->Enqueue(item);
 
               item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-              peeked_bytes+=item->GetSize();
+              if(item)
+                peeked_bytes+=item->GetSize();
 
               if (!OkToDrop (item, now, peeked_bytes))
                 {
@@ -262,7 +264,8 @@ CoDelQueueDisc::DoPeek (void)
               peek_queueBuffer->Enqueue(item);
 
               item = (in_peekedPackets > 0)? peek_queueBuffer->Dequeue() : peek_queue->Dequeue();
-              peeked_bytes+=item->GetSize();
+              if(item)
+                peeked_bytes+=item->GetSize();
 
               OkToDrop (item, now, peeked_bytes);
             }
@@ -310,10 +313,10 @@ CoDelQueueDisc::DoEnqueue (Ptr<QueueDiscItem> item)
 
   bool retval = GetInternalQueue (0)->Enqueue (item);
   if(retval && GetPeekType())
-  {
-    // Enqueue packets in peek_queue when Queue::Enqueue is sucessfull
-    peek_queue->Enqueue(item);
-  }
+    {
+      // Enqueue packets in peek_queue when Queue::Enqueue is sucessfull
+      peek_queue->Enqueue(item);
+    }
 
   // If Queue::Enqueue fails, QueueDisc::DropBeforeEnqueue is called by the
   // internal queue because QueueDisc::AddInternalQueue sets the trace callback

@@ -313,10 +313,10 @@ CoDelQueueDisc::DoEnqueue (Ptr<QueueDiscItem> item)
 
   bool retval = GetInternalQueue (0)->Enqueue (item);
   if(retval && GetPeekType())
-  {
-    // Enqueue packets in peek_queue when Queue::Enqueue is sucessfull
-    peek_queue->Enqueue(item);
-  }
+    {
+      // Enqueue packets in peek_queue when Queue::Enqueue is sucessfull
+      peek_queue->Enqueue(item);
+    }
 
   // If Queue::Enqueue fails, QueueDisc::DropBeforeEnqueue is called by the
   // internal queue because QueueDisc::AddInternalQueue sets the trace callback

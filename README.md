@@ -54,4 +54,6 @@ Existing `Peek()` and `DoPeek()` have some issues when it comes to the implement
 ```
 
 `CodelQueueDisc` class don't implement it's own `Peek()` & `DoPeek()`. It uses the functions defined in its base class `QueueDics`.Hence, to overcome this problem, it is required to override the `Peek()` & `"Dopeek()` function in `CodelQueueDisc` class, which doesn't perform a real internal dequeue.
- 
+
+**Fq-Codel**: It is an extended version of CoDel, designed to manage multiple flows of different types.
+To read more about Fq-CoDel: https://datatracker.ietf.org/doc/html/rfc8290

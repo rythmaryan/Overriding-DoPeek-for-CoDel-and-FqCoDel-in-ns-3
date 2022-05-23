@@ -98,8 +98,10 @@ public:
 
 private:
   int32_t m_deficit;    //!< the deficit for this flow
+  int32_t m_peekDeficit;    //!< the deficit for the peeked flows
   FlowStatus m_status;  //!< the status of this flow
   uint32_t m_index;     //!< the index for this flow
+
 };
 
 
@@ -176,6 +178,7 @@ private:
 
   std::list<Ptr<FqCoDelFlow> > m_newFlows;    //!< The list of new flows
   std::list<Ptr<FqCoDelFlow> > m_oldFlows;    //!< The list of old flows
+  
 
   std::map<uint32_t, uint32_t> m_flowsIndices;    //!< Map with the index of class for each flow
   std::map<uint32_t, uint32_t> m_tags;            //!< Tags used by set associative hash
@@ -187,4 +190,3 @@ private:
 } // namespace ns3
 
 #endif /* FQ_CODEL_QUEUE_DISC */
-

@@ -45,7 +45,8 @@ TypeId FqCoDelFlow::GetTypeId (void)
 FqCoDelFlow::FqCoDelFlow ()
   : m_deficit (0),
     m_status (INACTIVE),
-    m_index (0)
+    m_index (0),
+    m_peekDeficit (0)
 {
   NS_LOG_FUNCTION (this);
 }
@@ -69,11 +70,25 @@ FqCoDelFlow::GetDeficit (void) const
   return m_deficit;
 }
 
+int32_t
+FqCoDelFlow::GetPeekDeficit (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_peekDeficit;
+}
+
 void
 FqCoDelFlow::IncreaseDeficit (int32_t deficit)
 {
   NS_LOG_FUNCTION (this << deficit);
   m_deficit += deficit;
+}
+
+void
+FqCoDelFlow::SetPeekDeficit (int32_t deficit)
+{
+  NS_LOG_FUNCTION (this << deficit);
+  m_peekDeficit = deficit;
 }
 
 void
@@ -207,7 +222,7 @@ FqCoDelQueueDisc::SetAssociativeHash (uint32_t flowHash)
   uint32_t outerHash = h - innerHash;
 
   for (uint32_t i = outerHash; i < outerHash + m_setWays; i++)
-    {
+  {
       auto it = m_flowsIndices.find (i);
 
       if (it == m_flowsIndices.end ()
@@ -219,7 +234,7 @@ FqCoDelQueueDisc::SetAssociativeHash (uint32_t flowHash)
           m_tags[i] = flowHash;
           return i;
         }
-    }
+  }
 
   // all the queues of the set are used. Use the first queue of the set
   m_tags[outerHash] = flowHash;
@@ -309,25 +324,25 @@ FqCoDelQueueDisc::DoEnqueue (Ptr<QueueDiscItem> item)
 }
 
 Ptr<QueueDiscItem>
-FqCoDelQueueDisc::DoDequeue (void)
+FqCoDelQueueDisc::DoDequeue (void) //Did dequeue of the item
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<FqCoDelFlow> flow;
-  Ptr<QueueDiscItem> item;
+  Ptr<FqCoDelFlow> flow; //Select a flow from the available flows
+  Ptr<QueueDiscItem> item; //Create an item pointer
 
   do
     {
       bool found = false;
 
-      while (!found && !m_newFlows.empty ())
+      while (!found && !m_newFlows.empty ()) //if found=false & flow queue is not empty
         {
-          flow = m_newFlows.front ();
+          flow = m_newFlows.front (); //Get the front item of the flow queue
 
-          if (flow->GetDeficit () <= 0)
+          if (flow->GetDeficit () <= 0) //deficit means time quantum, if deficit is <=0
             {
-              NS_LOG_DEBUG ("Increase deficit for new flow index " << flow->GetIndex ());
-              flow->IncreaseDeficit (m_quantum);
+              NS_LOG_DEBUG ("Increase deficit for new flow index " << flow->GetIndex ()); //index of flow
+              flow->IncreaseDeficit (m_quantum);// increase time quantun for selected flow
               flow->SetStatus (FqCoDelFlow::OLD_FLOW);
               m_oldFlows.splice (m_oldFlows.end (), m_newFlows, m_newFlows.begin ());
             }
@@ -455,6 +470,7 @@ FqCoDelQueueDisc::InitializeParams (void)
   m_queueDiscFactory.Set ("MaxSize", QueueSizeValue (GetMaxSize ()));
   m_queueDiscFactory.Set ("Interval", StringValue (m_interval));
   m_queueDiscFactory.Set ("Target", StringValue (m_target));
+
 }
 
 uint32_t
@@ -493,5 +509,57 @@ FqCoDelQueueDisc::FqCoDelDrop (void)
   return index;
 }
 
-} // namespace ns3
+Ptr<QueueDiscItem>
+FqCoDelQueueDisc::DoPeek (void)
+{
+    Ptr<FqCoDelFlow> pFlow;
+    std::list<Ptr<FqCoDelFlow> > peekedFlows;
+    Ptr<QueueDiscItem> pitem;
 
+    if(m_newFlows.size()==0 && m_oldFlows.size()==0){return 0;}
+
+    else if(m_newFlows.size()>0){
+      for(auto it=m_newFlows.begin();it!=m_newFlows.end();it++){
+          pFlow = *it;
+          if(pFlow.GetDeficit () <= 0){
+            pFlow->SetPeekDeficit(GetDeficit () + m_quantum);
+            peekedFlows.push_back(pFlow);
+          }
+          else{
+            pitem = pflow->GetQueueDisc ()->Peek(); 
+            if(pitem) {return pitem;}
+            else peekedFlows.push_back(pFlow);
+          }
+      }
+    } 
+
+    else if(m_oldFlows.size()>0){
+        for(auto it=m_oldFlows.begin();it!=m_oldFlows.end();it++){
+          pFlow = *it;
+          if(pFlow.GetDeficit () <= 0){
+            pFlow->SetPeekDeficit(GetDeficit () + m_quantum);
+            peekedFlows.push_back(pFlow);
+          }
+          else{
+            pitem = pflow->GetQueueDisc ()->Peek(); 
+            if(pitem) {return pitem;}
+          }
+      }
+    }
+
+    while(!pitem){
+      if(peekedFlows.size()==0) return 0;
+          pFlow = peekedFlows.front();
+
+          if(pFlow.GetPeekDeficit () <= 0){
+            pFlow->SetPeekDeficit(GetPeekDeficit () + m_quantum);
+            peekedFlows.splice(peekedFlows.end (), peekedFlows, peekedFlows.begin ());
+                                          }
+          else{
+            pitem = pflow->GetQueueDisc ()->Peek(); 
+            if(pitem) {return pitem;}
+            else peekedFlows.pop_front ();
+              }
+                }
+}
+} // namespace ns3
